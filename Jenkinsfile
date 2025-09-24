@@ -21,8 +21,7 @@ pipeline {
                     rmdir /S /Q "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\bookManagement"
                 )
                 mkdir "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\bookManagement"
-               
-                xcopy /E /I /Y FRONTEND\\build\\* "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\bookManagement"
+                xcopy /E /I /Y FRONTEND\\dist\\* "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\bookManagement"
                 '''
             }
         }
@@ -31,7 +30,7 @@ pipeline {
         stage('Build Backend') {
             steps {
                 dir('BACKEND') {
-                    bat 'mvn clean package -DskipTests'
+                    bat 'mvn clean package'
                 }
             }
         }
@@ -46,20 +45,11 @@ pipeline {
                 if exist "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\bookManagement" (
                     rmdir /S /Q "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\bookManagement"
                 )
-                copy "BACKEND\\target\\*.war" "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\bookManagement.war"
+                copy "BACKEND\\target\\*.war" "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\"
                 '''
             }
         }
 
-        // ===== RESTART TOMCAT =====
-        stage('Restart Tomcat') {
-            steps {
-                bat '''
-                net stop Tomcat10
-                net start Tomcat10
-                '''
-            }
-        }
     }
 
     post {
