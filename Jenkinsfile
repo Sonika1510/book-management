@@ -6,7 +6,7 @@ pipeline {
         // ===== FRONTEND BUILD =====
         stage('Build Frontend') {
             steps {
-                // Change the directory to the correct sub-folder
+                // Go inside frontend project folder
                 dir('FRONTEND/book-frontend') {
                     bat 'npm install'
                     bat 'npm run build'
@@ -22,7 +22,7 @@ pipeline {
                     rmdir /S /Q "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\bookManagement"
                 )
                 mkdir "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\bookManagement"
-                // Change the source path to the new sub-folder
+                REM Copy frontend build output (dist folder created by Vite)
                 xcopy /E /I /Y FRONTEND\\book-frontend\\dist\\* "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\bookManagement"
                 '''
             }
