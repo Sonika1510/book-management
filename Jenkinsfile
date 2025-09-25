@@ -1,12 +1,13 @@
 pipeline {
     agent any
 
-    tools {
-        maven 'MAVEN'   // 👈 name you gave in Global Tool Configuration
-        jdk 'JAVA'      // (optional, if you configured JDK in Jenkins tools)
-    }
-
     stages {
+        stage('Checkout SCM') {
+            steps {
+                checkout scm
+            }
+        }
+
         stage('Build Frontend') {
             steps {
                 dir('FRONTEND/book-frontend') {
@@ -19,11 +20,11 @@ pipeline {
         stage('Deploy Frontend to Tomcat') {
             steps {
                 bat '''
-                if exist "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\bookManagement" (
-                    rmdir /S /Q "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\bookManagement"
-                )
-                mkdir "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\bookManagement"
-                xcopy /E /I /Y FRONTEND\\book-frontend\\dist\\* "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\bookManagement"
+                    if exist "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\bookManagement" (
+                        rmdir /S /Q "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\bookManagement"
+                    )
+                    mkdir "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\bookManagement"
+                    xcopy /E /I /Y FRONTEND\\book-frontend\\dist\\* "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\bookManagement"
                 '''
             }
         }
@@ -39,13 +40,13 @@ pipeline {
         stage('Deploy Backend to Tomcat') {
             steps {
                 bat '''
-                if exist "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\bookManagement.war" (
-                    del /Q "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\bookManagement.war"
-                )
-                if exist "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\bookManagement" (
-                    rmdir /S /Q "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\bookManagement"
-                )
-                copy "BACKEND\\target\\*.war" "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\"
+                    if exist "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\bookManagement.war" (
+                        del /Q "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\bookManagement.war"
+                    )
+                    if exist "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\bookManagement" (
+                        rmdir /S /Q "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\bookManagement"
+                    )
+                    copy "BACKEND\\bookmanagement\\target\\*.war" "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\"
                 '''
             }
         }
@@ -53,10 +54,10 @@ pipeline {
 
     post {
         success {
-            echo 'Deployment Successful!'
+            echo 'Build and deployment succeeded!'
         }
         failure {
-            echo 'Pipeline Failed.'
+            echo 'Build or deployment failed.'
         }
     }
 }
