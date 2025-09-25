@@ -8,7 +8,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/books")
-@CrossOrigin(origins = "http://localhost:5173") // allow React frontend
+@CrossOrigin(origins = "*") // allow all origins
 public class BookController {
 
     private final BookRepository bookRepository;
