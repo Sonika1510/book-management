@@ -14,7 +14,7 @@ export default function App() {
 
   const fetchBooks = async () => {
     try {
-      const res = await axios.get("http://localhost:2025/api/books");
+      const res = await axios.get("http://localhost:2005/api/books");
       setBooks(res.data);
     } catch (err) {
       setError("❌ Failed to fetch books.");
@@ -29,10 +29,10 @@ export default function App() {
     e.preventDefault();
     try {
       if (isEditing) {
-        await axios.put(`http://localhost:2025/api/books/${form.id}`, form);
+        await axios.put(`http://localhost:2005/api/books/${form.id}`, form);
         setMessage("✅ Book updated successfully!");
       } else {
-        await axios.post("http://localhost:2025/api/books", form);
+        await axios.post("http://localhost:2005/api/books", form);
         setMessage("✅ Book added successfully!");
       }
       setForm({ id: null, title: "", author: "", price: "" });
@@ -46,7 +46,7 @@ export default function App() {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:2025/api/books/${id}`);
+      await axios.delete(`http://localhost:2005/api/books/${id}`);
       setMessage("🗑️ Book deleted successfully!");
       setError("");
       fetchBooks();
