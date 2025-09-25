@@ -2,24 +2,22 @@ pipeline {
     agent any
 
     environment {
-        // Update these to match your Jenkins tool installations
-        MAVEN_HOME = tool 'Maven'       // Name of Maven installation in Jenkins
-        NODEJS_HOME = tool 'NodeJS'     // Name of NodeJS installation in Jenkins
-        JAVA_HOME = tool 'JDK'          // Name of Java installation in Jenkins
-        PATH = "${env.MAVEN_HOME}/bin;${env.NODEJS_HOME}/bin;${env.JAVA_HOME}/bin;${env.PATH}"
+        MAVEN_HOME = tool 'MAVEN'       // Name of Maven installation in Jenkins
+        
+        JAVA_HOME = tool 'JAVA'          // Name of Java installation in Jenkins
+       
     }
 
     stages {
         stage('Checkout SCM') {
             steps {
-                // Checkout from main branch - update if your branch name is different
                 git branch: 'main', url: 'https://github.com/Sonika1510/book-management.git'
             }
         }
 
         stage('Build Frontend') {
             steps {
-                dir('FRONTEND/book-frontend') {
+                dir('src') {  // your frontend is inside 'src'
                     sh 'npm install'
                     sh 'npm run build'
                 }
@@ -33,7 +31,7 @@ pipeline {
 
                     bat "if exist \"${tomcatPath}\" rmdir /S /Q \"${tomcatPath}\""
                     bat "mkdir \"${tomcatPath}\""
-                    bat "xcopy /E /I /Y FRONTEND\\book-frontend\\dist\\* \"${tomcatPath}\""
+                    bat "xcopy /E /I /Y src\\build\\* \"${tomcatPath}\""  // assuming build output is in src/build
                 }
             }
         }
