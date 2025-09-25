@@ -1,65 +1,65 @@
 pipeline {
     agent any
 
+    tools {
+        // Replace these names with the names you configured in Jenkins Global Tool Config
+        jdk 'JAVA'      // Your installed JDK name
+        maven 'MAVEN'   // Your installed Maven name
+    }
+
     environment {
-        MAVEN_HOME = tool 'MAVEN'       // Name of Maven installation in Jenkins
-        
-        JAVA_HOME = tool 'JAVA'          // Name of Java installation in Jenkins
-       
+        TOMCAT_PATH = 'C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps'
     }
 
     stages {
         stage('Checkout SCM') {
             steps {
-                git branch: 'main', url: 'https://github.com/Sonika1510/book-management.git'
+                git 'https://github.com/Sonika1510/book-management.git'
             }
         }
 
         stage('Build Frontend') {
             steps {
-                dir('src') {  // your frontend is inside 'src'
-                    sh 'npm install'
-                    sh 'npm run build'
+                dir('FRONTEND/book-frontend') {
+                    bat 'npm install'
+                    bat 'npm run build'
                 }
             }
         }
 
         stage('Deploy Frontend to Tomcat') {
             steps {
-                script {
-                    def tomcatPath = 'C:/Program Files/Apache Software Foundation/Tomcat 10.1/webapps/bookManagement'
-
-                    bat "if exist \"${tomcatPath}\" rmdir /S /Q \"${tomcatPath}\""
-                    bat "mkdir \"${tomcatPath}\""
-                    bat "xcopy /E /I /Y src\\build\\* \"${tomcatPath}\""  // assuming build output is in src/build
-                }
+                bat """
+                    if exist "${TOMCAT_PATH}\\bookManagement" rmdir /S /Q "${TOMCAT_PATH}\\bookManagement"
+                    mkdir "${TOMCAT_PATH}\\bookManagement"
+                    xcopy /E /I /Y FRONTEND\\book-frontend\\dist\\* "${TOMCAT_PATH}\\bookManagement\\"
+                """
             }
         }
 
         stage('Build Backend') {
             steps {
                 dir('BACKEND/bookmanagement') {
-                    bat "${MAVEN_HOME}\\bin\\mvn clean package"
+                    // Runs mvn clean package using Maven and JDK configured in Jenkins tools
+                    bat 'mvn clean package'
                 }
             }
         }
 
         stage('Deploy Backend to Tomcat') {
             steps {
-                script {
-                    def tomcatWarPath = 'C:/Program Files/Apache Software Foundation/Tomcat 10.1/webapps/bookManagement.war'
-                    def warSource = 'BACKEND/bookmanagement/target/bookManagement.war'
-
-                    bat "if exist \"${tomcatWarPath}\" del /Q \"${tomcatWarPath}\""
-                    bat "copy /Y \"${warSource}\" \"C:/Program Files/Apache Software Foundation/Tomcat 10.1/webapps/\""
-                }
+                bat """
+                    if exist "${TOMCAT_PATH}\\bookManagement.war" del /Q "${TOMCAT_PATH}\\bookManagement.war"
+                    if exist "${TOMCAT_PATH}\\bookManagement" rmdir /S /Q "${TOMCAT_PATH}\\bookManagement"
+                    copy BACKEND\\bookmanagement\\target\\bookManagement.war "${TOMCAT_PATH}\\"
+                """
             }
         }
     }
 
     post {
         success {
-            echo 'Build and deployment succeeded.'
+            echo 'Build and deployment completed successfully!'
         }
         failure {
             echo 'Build or deployment failed.'
