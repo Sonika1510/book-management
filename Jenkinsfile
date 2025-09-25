@@ -30,7 +30,7 @@ pipeline {
 
         stage('Build Backend') {
             steps {
-                dir('BACKEND') {
+                dir('BACKEND/bookmanagement') {
                     bat 'mvn clean package'
                 }
             }
