@@ -1,12 +1,14 @@
 pipeline {
     agent any
 
-    stages {
+    tools {
+        maven 'MAVEN'   // 👈 name you gave in Global Tool Configuration
+        jdk 'JDK21'      // (optional, if you configured JDK in Jenkins tools)
+    }
 
-        // ===== FRONTEND BUILD =====
+    stages {
         stage('Build Frontend') {
             steps {
-                // Go inside frontend project folder
                 dir('FRONTEND/book-frontend') {
                     bat 'npm install'
                     bat 'npm run build'
@@ -14,7 +16,6 @@ pipeline {
             }
         }
 
-        // ===== FRONTEND DEPLOY =====
         stage('Deploy Frontend to Tomcat') {
             steps {
                 bat '''
@@ -22,13 +23,11 @@ pipeline {
                     rmdir /S /Q "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\bookManagement"
                 )
                 mkdir "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\bookManagement"
-                REM Copy frontend build output (dist folder created by Vite)
                 xcopy /E /I /Y FRONTEND\\book-frontend\\dist\\* "C:\\Program Files\\Apache Software Foundation\\Tomcat 10.1\\webapps\\bookManagement"
                 '''
             }
         }
 
-        // ===== BACKEND BUILD =====
         stage('Build Backend') {
             steps {
                 dir('BACKEND') {
@@ -37,7 +36,6 @@ pipeline {
             }
         }
 
-        // ===== BACKEND DEPLOY =====
         stage('Deploy Backend to Tomcat') {
             steps {
                 bat '''
@@ -51,7 +49,6 @@ pipeline {
                 '''
             }
         }
-
     }
 
     post {
