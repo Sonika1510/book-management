@@ -1,6 +1,10 @@
 pipeline {
     agent any
-
+         tools {
+        // Replace these names with the names you configured in Jenkins Global Tool Config
+        jdk 'JAVA'      // Your installed JDK name
+        maven 'MAVEN'   // Your installed Maven name
+    }
     stages {
 
         // ===== FRONTEND BUILD =====
